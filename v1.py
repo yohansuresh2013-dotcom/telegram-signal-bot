@@ -10,7 +10,7 @@ import json
 import os
 
 # ==================== CONFIGURATION ====================
-BOT_TOKEN = "8586468507:AAHy5MTwjTp-uGDW6UffwM6EiW62m69nxZg"
+BOT_TOKEN = "8586468507:AAF6AqTYBiL2ucH4BmXxSZR64W1X5D-Vdfs"
 DEFAULT_CHANNEL = "@botsignal007"
 
 # ==================== LOGGING ====================
@@ -25,139 +25,8 @@ user_data = {}
 processed_results = {}
 MTG_GAP_MINUTES = 3
 
-# ==================== HELPER: Replace asset name ====================
-def replace_asset(signal_list, new_asset):
-    result = []
-    for s in signal_list:
-        s = s.replace("USDBRL-OTC", f"{new_asset}-OTC")
-        s = s.replace("USDCOP-OTC", f"{new_asset}-OTC")
-        s = s.replace("USDEGP-OTC", f"{new_asset}-OTC")
-        result.append(s)
-    return result
-
-# ==================== BASE SIGNAL LISTS ====================
-_BASE_BRL = [
-    "🧪 USDBRL-OTC ☞ 08:39 🦅 CALL","🧪 USDBRL-OTC ☞ 08:45 🦅 CALL","🧪 USDBRL-OTC ☞ 08:51 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 08:56 🦅 CALL","🧪 USDBRL-OTC ☞ 08:59 🦅 CALL","🧪 USDBRL-OTC ☞ 09:03 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 09:07 🦅 CALL","🧪 USDBRL-OTC ☞ 09:10 🦅 CALL","🧪 USDBRL-OTC ☞ 09:14 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 09:17 🦅 CALL","🧪 USDBRL-OTC ☞ 09:20 🦅 CALL","🧪 USDBRL-OTC ☞ 09:25 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 09:28 🦅 CALL","🧪 USDBRL-OTC ☞ 09:35 🦅 CALL","🧪 USDBRL-OTC ☞ 09:41 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 09:47 🦅 CALL","🧪 USDBRL-OTC ☞ 09:52 🦅 CALL","🧪 USDBRL-OTC ☞ 09:57 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 10:03 🦅 PUT","🧪 USDBRL-OTC ☞ 10:10 🦅 PUT","🧪 USDBRL-OTC ☞ 10:14 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 10:18 🦅 PUT","🧪 USDBRL-OTC ☞ 10:22 🦅 PUT","🧪 USDBRL-OTC ☞ 10:26 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 10:30 🦅 PUT","🧪 USDBRL-OTC ☞ 10:34 🦅 PUT","🧪 USDBRL-OTC ☞ 10:37 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 10:44 🦅 PUT","🧪 USDBRL-OTC ☞ 10:49 🦅 PUT","🧪 USDBRL-OTC ☞ 10:53 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 10:57 🦅 PUT","🧪 USDBRL-OTC ☞ 11:03 🦅 CALL","🧪 USDBRL-OTC ☞ 11:07 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 11:10 🦅 PUT","🧪 USDBRL-OTC ☞ 11:17 🦅 CALL","🧪 USDBRL-OTC ☞ 11:23 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 11:29 🦅 CALL","🧪 USDBRL-OTC ☞ 11:34 🦅 PUT","🧪 USDBRL-OTC ☞ 11:39 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 11:46 🦅 CALL","🧪 USDBRL-OTC ☞ 11:49 🦅 PUT","🧪 USDBRL-OTC ☞ 11:54 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 11:59 🦅 CALL","🧪 USDBRL-OTC ☞ 12:04 🦅 CALL","🧪 USDBRL-OTC ☞ 12:10 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 12:17 🦅 CALL","🧪 USDBRL-OTC ☞ 12:20 🦅 CALL","🧪 USDBRL-OTC ☞ 12:25 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 12:32 🦅 CALL","🧪 USDBRL-OTC ☞ 12:35 🦅 CALL","🧪 USDBRL-OTC ☞ 12:38 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 12:42 🦅 CALL","🧪 USDBRL-OTC ☞ 12:45 🦅 PUT","🧪 USDBRL-OTC ☞ 12:52 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 12:58 🦅 CALL","🧪 USDBRL-OTC ☞ 13:03 🦅 PUT","🧪 USDBRL-OTC ☞ 13:06 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 13:13 🦅 CALL","🧪 USDBRL-OTC ☞ 13:20 🦅 PUT","🧪 USDBRL-OTC ☞ 13:25 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 13:29 🦅 CALL","🧪 USDBRL-OTC ☞ 13:33 🦅 PUT","🧪 USDBRL-OTC ☞ 13:39 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 13:42 🦅 PUT","🧪 USDBRL-OTC ☞ 13:46 🦅 PUT","🧪 USDBRL-OTC ☞ 13:52 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 13:59 🦅 CALL","🧪 USDBRL-OTC ☞ 14:05 🦅 CALL","🧪 USDBRL-OTC ☞ 14:09 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 14:13 🦅 PUT","🧪 USDBRL-OTC ☞ 14:17 🦅 CALL","🧪 USDBRL-OTC ☞ 14:24 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 14:28 🦅 CALL","🧪 USDBRL-OTC ☞ 14:34 🦅 CALL","🧪 USDBRL-OTC ☞ 14:41 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 14:47 🦅 PUT","🧪 USDBRL-OTC ☞ 14:53 🦅 PUT","🧪 USDBRL-OTC ☞ 14:59 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 15:05 🦅 PUT","🧪 USDBRL-OTC ☞ 15:10 🦅 CALL","🧪 USDBRL-OTC ☞ 15:14 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 15:18 🦅 CALL","🧪 USDBRL-OTC ☞ 15:24 🦅 PUT","🧪 USDBRL-OTC ☞ 15:30 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 15:36 🦅 CALL","🧪 USDBRL-OTC ☞ 15:39 🦅 PUT","🧪 USDBRL-OTC ☞ 15:42 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 15:45 🦅 CALL","🧪 USDBRL-OTC ☞ 15:52 🦅 PUT","🧪 USDBRL-OTC ☞ 15:57 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 16:03 🦅 PUT","🧪 USDBRL-OTC ☞ 16:10 🦅 PUT","🧪 USDBRL-OTC ☞ 16:16 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 16:22 🦅 CALL","🧪 USDBRL-OTC ☞ 16:28 🦅 PUT","🧪 USDBRL-OTC ☞ 16:35 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 16:41 🦅 CALL","🧪 USDBRL-OTC ☞ 16:44 🦅 PUT","🧪 USDBRL-OTC ☞ 16:47 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 16:52 🦅 CALL","🧪 USDBRL-OTC ☞ 16:57 🦅 PUT","🧪 USDBRL-OTC ☞ 17:00 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 17:05 🦅 CALL","🧪 USDBRL-OTC ☞ 17:10 🦅 PUT","🧪 USDBRL-OTC ☞ 17:16 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 17:20 🦅 PUT","🧪 USDBRL-OTC ☞ 17:25 🦅 CALL","🧪 USDBRL-OTC ☞ 17:30 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 17:36 🦅 PUT","🧪 USDBRL-OTC ☞ 17:42 🦅 CALL","🧪 USDBRL-OTC ☞ 17:48 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 17:54 🦅 CALL","🧪 USDBRL-OTC ☞ 18:01 🦅 CALL","🧪 USDBRL-OTC ☞ 18:07 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 18:11 🦅 CALL","🧪 USDBRL-OTC ☞ 18:18 🦅 PUT","🧪 USDBRL-OTC ☞ 18:21 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 18:24 🦅 CALL","🧪 USDBRL-OTC ☞ 18:31 🦅 CALL","🧪 USDBRL-OTC ☞ 18:35 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 18:38 🦅 CALL","🧪 USDBRL-OTC ☞ 18:42 🦅 CALL","🧪 USDBRL-OTC ☞ 18:49 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 18:54 🦅 PUT","🧪 USDBRL-OTC ☞ 18:58 🦅 CALL","🧪 USDBRL-OTC ☞ 19:02 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 19:07 🦅 PUT","🧪 USDBRL-OTC ☞ 19:10 🦅 PUT","🧪 USDBRL-OTC ☞ 19:14 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 19:19 🦅 CALL","🧪 USDBRL-OTC ☞ 19:23 🦅 CALL","🧪 USDBRL-OTC ☞ 19:28 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 19:33 🦅 PUT","🧪 USDBRL-OTC ☞ 19:39 🦅 PUT","🧪 USDBRL-OTC ☞ 19:46 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 19:51 🦅 CALL","🧪 USDBRL-OTC ☞ 19:57 🦅 PUT","🧪 USDBRL-OTC ☞ 20:00 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 20:05 🦅 CALL","🧪 USDBRL-OTC ☞ 20:12 🦅 PUT","🧪 USDBRL-OTC ☞ 20:18 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 20:21 🦅 PUT","🧪 USDBRL-OTC ☞ 20:26 🦅 PUT","🧪 USDBRL-OTC ☞ 20:30 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 20:35 🦅 PUT","🧪 USDBRL-OTC ☞ 20:41 🦅 CALL","🧪 USDBRL-OTC ☞ 20:47 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 20:50 🦅 CALL","🧪 USDBRL-OTC ☞ 20:57 🦅 PUT","🧪 USDBRL-OTC ☞ 21:04 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 21:09 🦅 PUT","🧪 USDBRL-OTC ☞ 21:15 🦅 CALL","🧪 USDBRL-OTC ☞ 21:22 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 21:29 🦅 PUT","🧪 USDBRL-OTC ☞ 21:36 🦅 CALL","🧪 USDBRL-OTC ☞ 21:40 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 21:46 🦅 PUT","🧪 USDBRL-OTC ☞ 21:53 🦅 CALL","🧪 USDBRL-OTC ☞ 21:56 🦅 PUT",
-    "🧪 USDBRL-OTC ☞ 22:03 🦅 PUT","🧪 USDBRL-OTC ☞ 22:08 🦅 PUT","🧪 USDBRL-OTC ☞ 22:14 🦅 CALL",
-    "🧪 USDBRL-OTC ☞ 22:19 🦅 PUT","🧪 USDBRL-OTC ☞ 22:22 🦅 CALL",
-]
-
-_BASE_COP = [
-    "🧪 USDCOP-OTC ☞ 08:20 🦅 CALL","🧪 USDCOP-OTC ☞ 08:26 🦅 PUT","🧪 USDCOP-OTC ☞ 08:31 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 08:34 🦅 CALL","🧪 USDCOP-OTC ☞ 08:40 🦅 PUT","🧪 USDCOP-OTC ☞ 08:44 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 08:50 🦅 PUT","🧪 USDCOP-OTC ☞ 08:57 🦅 CALL","🧪 USDCOP-OTC ☞ 09:03 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 09:08 🦅 CALL","🧪 USDCOP-OTC ☞ 09:12 🦅 CALL","🧪 USDCOP-OTC ☞ 09:18 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 09:24 🦅 PUT","🧪 USDCOP-OTC ☞ 09:27 🦅 PUT","🧪 USDCOP-OTC ☞ 09:30 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 09:36 🦅 CALL","🧪 USDCOP-OTC ☞ 09:42 🦅 CALL","🧪 USDCOP-OTC ☞ 09:46 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 09:53 🦅 PUT","🧪 USDCOP-OTC ☞ 09:56 🦅 PUT","🧪 USDCOP-OTC ☞ 09:59 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 10:06 🦅 PUT","🧪 USDCOP-OTC ☞ 10:12 🦅 CALL","🧪 USDCOP-OTC ☞ 10:19 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 10:22 🦅 CALL","🧪 USDCOP-OTC ☞ 10:27 🦅 PUT","🧪 USDCOP-OTC ☞ 10:34 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 10:41 🦅 PUT","🧪 USDCOP-OTC ☞ 10:46 🦅 PUT","🧪 USDCOP-OTC ☞ 10:50 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 10:53 🦅 PUT","🧪 USDCOP-OTC ☞ 10:59 🦅 CALL","🧪 USDCOP-OTC ☞ 11:05 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 11:09 🦅 PUT","🧪 USDCOP-OTC ☞ 11:12 🦅 PUT","🧪 USDCOP-OTC ☞ 11:17 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 11:24 🦅 CALL","🧪 USDCOP-OTC ☞ 11:29 🦅 CALL","🧪 USDCOP-OTC ☞ 11:35 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 11:38 🦅 CALL","🧪 USDCOP-OTC ☞ 11:43 🦅 CALL","🧪 USDCOP-OTC ☞ 11:50 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 11:54 🦅 PUT","🧪 USDCOP-OTC ☞ 11:58 🦅 PUT","🧪 USDCOP-OTC ☞ 12:05 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 12:10 🦅 CALL","🧪 USDCOP-OTC ☞ 12:14 🦅 CALL","🧪 USDCOP-OTC ☞ 12:20 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 12:23 🦅 CALL","🧪 USDCOP-OTC ☞ 12:26 🦅 CALL","🧪 USDCOP-OTC ☞ 12:29 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 12:34 🦅 CALL","🧪 USDCOP-OTC ☞ 12:37 🦅 CALL","🧪 USDCOP-OTC ☞ 12:40 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 12:43 🦅 CALL","🧪 USDCOP-OTC ☞ 12:47 🦅 CALL","🧪 USDCOP-OTC ☞ 12:54 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 12:59 🦅 PUT","🧪 USDCOP-OTC ☞ 13:05 🦅 PUT","🧪 USDCOP-OTC ☞ 13:10 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 13:14 🦅 PUT","🧪 USDCOP-OTC ☞ 13:19 🦅 PUT","🧪 USDCOP-OTC ☞ 13:24 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 13:27 🦅 PUT","🧪 USDCOP-OTC ☞ 13:30 🦅 CALL","🧪 USDCOP-OTC ☞ 13:36 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 13:41 🦅 PUT","🧪 USDCOP-OTC ☞ 13:46 🦅 CALL","🧪 USDCOP-OTC ☞ 13:49 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 13:55 🦅 CALL","🧪 USDCOP-OTC ☞ 13:58 🦅 CALL","🧪 USDCOP-OTC ☞ 14:05 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 14:11 🦅 PUT","🧪 USDCOP-OTC ☞ 14:14 🦅 PUT","🧪 USDCOP-OTC ☞ 14:19 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 14:25 🦅 PUT","🧪 USDCOP-OTC ☞ 14:30 🦅 CALL","🧪 USDCOP-OTC ☞ 14:35 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 14:41 🦅 PUT","🧪 USDCOP-OTC ☞ 14:47 🦅 CALL","🧪 USDCOP-OTC ☞ 14:54 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 14:57 🦅 CALL","🧪 USDCOP-OTC ☞ 15:03 🦅 PUT","🧪 USDCOP-OTC ☞ 15:07 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 15:13 🦅 PUT","🧪 USDCOP-OTC ☞ 15:19 🦅 PUT","🧪 USDCOP-OTC ☞ 15:24 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 15:29 🦅 CALL","🧪 USDCOP-OTC ☞ 15:33 🦅 PUT","🧪 USDCOP-OTC ☞ 15:40 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 15:44 🦅 PUT","🧪 USDCOP-OTC ☞ 15:50 🦅 CALL","🧪 USDCOP-OTC ☞ 15:56 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 16:00 🦅 CALL","🧪 USDCOP-OTC ☞ 16:03 🦅 PUT","🧪 USDCOP-OTC ☞ 16:06 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 16:09 🦅 CALL","🧪 USDCOP-OTC ☞ 16:13 🦅 PUT","🧪 USDCOP-OTC ☞ 16:20 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 16:27 🦅 CALL","🧪 USDCOP-OTC ☞ 16:30 🦅 CALL","🧪 USDCOP-OTC ☞ 16:34 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 16:37 🦅 PUT","🧪 USDCOP-OTC ☞ 16:43 🦅 PUT","🧪 USDCOP-OTC ☞ 16:50 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 16:53 🦅 CALL","🧪 USDCOP-OTC ☞ 16:56 🦅 CALL","🧪 USDCOP-OTC ☞ 17:03 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 17:08 🦅 CALL","🧪 USDCOP-OTC ☞ 17:14 🦅 PUT","🧪 USDCOP-OTC ☞ 17:21 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 17:27 🦅 CALL","🧪 USDCOP-OTC ☞ 17:33 🦅 CALL","🧪 USDCOP-OTC ☞ 17:38 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 17:41 🦅 PUT","🧪 USDCOP-OTC ☞ 17:44 🦅 PUT","🧪 USDCOP-OTC ☞ 17:51 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 17:56 🦅 PUT","🧪 USDCOP-OTC ☞ 18:02 🦅 PUT","🧪 USDCOP-OTC ☞ 18:06 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 18:13 🦅 PUT","🧪 USDCOP-OTC ☞ 18:16 🦅 PUT","🧪 USDCOP-OTC ☞ 18:21 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 18:26 🦅 CALL","🧪 USDCOP-OTC ☞ 18:30 🦅 PUT","🧪 USDCOP-OTC ☞ 18:33 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 18:40 🦅 PUT","🧪 USDCOP-OTC ☞ 18:44 🦅 PUT","🧪 USDCOP-OTC ☞ 18:48 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 18:52 🦅 CALL","🧪 USDCOP-OTC ☞ 18:57 🦅 CALL","🧪 USDCOP-OTC ☞ 19:02 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 19:09 🦅 CALL","🧪 USDCOP-OTC ☞ 19:13 🦅 PUT","🧪 USDCOP-OTC ☞ 19:20 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 19:26 🦅 PUT","🧪 USDCOP-OTC ☞ 19:29 🦅 PUT","🧪 USDCOP-OTC ☞ 19:34 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 19:37 🦅 CALL","🧪 USDCOP-OTC ☞ 19:40 🦅 PUT","🧪 USDCOP-OTC ☞ 19:43 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 19:50 🦅 PUT","🧪 USDCOP-OTC ☞ 19:54 🦅 CALL","🧪 USDCOP-OTC ☞ 19:57 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 20:02 🦅 PUT","🧪 USDCOP-OTC ☞ 20:05 🦅 PUT","🧪 USDCOP-OTC ☞ 20:08 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 20:14 🦅 PUT","🧪 USDCOP-OTC ☞ 20:17 🦅 CALL","🧪 USDCOP-OTC ☞ 20:21 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 20:28 🦅 PUT","🧪 USDCOP-OTC ☞ 20:32 🦅 PUT","🧪 USDCOP-OTC ☞ 20:36 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 20:42 🦅 CALL","🧪 USDCOP-OTC ☞ 20:46 🦅 CALL","🧪 USDCOP-OTC ☞ 20:50 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 20:55 🦅 PUT","🧪 USDCOP-OTC ☞ 21:02 🦅 CALL","🧪 USDCOP-OTC ☞ 21:06 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 21:11 🦅 PUT","🧪 USDCOP-OTC ☞ 21:16 🦅 CALL","🧪 USDCOP-OTC ☞ 21:22 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 21:27 🦅 PUT","🧪 USDCOP-OTC ☞ 21:33 🦅 PUT","🧪 USDCOP-OTC ☞ 21:38 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 21:41 🦅 PUT","🧪 USDCOP-OTC ☞ 21:47 🦅 PUT","🧪 USDCOP-OTC ☞ 21:52 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 21:56 🦅 CALL","🧪 USDCOP-OTC ☞ 22:03 🦅 CALL","🧪 USDCOP-OTC ☞ 22:08 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 22:11 🦅 PUT","🧪 USDCOP-OTC ☞ 22:18 🦅 CALL","🧪 USDCOP-OTC ☞ 22:25 🦅 CALL",
-    "🧪 USDCOP-OTC ☞ 22:28 🦅 CALL","🧪 USDCOP-OTC ☞ 22:33 🦅 CALL","🧪 USDCOP-OTC ☞ 22:37 🦅 PUT",
-    "🧪 USDCOP-OTC ☞ 22:41 🦅 PUT","🧪 USDCOP-OTC ☞ 22:46 🦅 PUT","🧪 USDCOP-OTC ☞ 22:53 🦅 CALL",
-]
-
-_BASE_EGP = [
+# ==================== ALL SIGNALS ====================
+USDEGP_SIGNALS = [
     "🧪 USDEGP-OTC ☞ 08:18 🦅 PUT","🧪 USDEGP-OTC ☞ 08:25 🦅 PUT","🧪 USDEGP-OTC ☞ 08:30 🦅 PUT",
     "🧪 USDEGP-OTC ☞ 08:33 🦅 CALL","🧪 USDEGP-OTC ☞ 08:40 🦅 CALL","🧪 USDEGP-OTC ☞ 08:45 🦅 PUT",
     "🧪 USDEGP-OTC ☞ 08:49 🦅 PUT","🧪 USDEGP-OTC ☞ 08:56 🦅 PUT","🧪 USDEGP-OTC ☞ 08:59 🦅 CALL",
@@ -220,37 +89,126 @@ _BASE_EGP = [
     "🧪 USDEGP-OTC ☞ 22:49 🦅 PUT","🧪 USDEGP-OTC ☞ 22:56 🦅 PUT",
 ]
 
-# ==================== ALL 12 ASSET SIGNAL LISTS ====================
-USDBRL_SIGNALS = _BASE_BRL
-USDCOP_SIGNALS = _BASE_COP
-USDEGP_SIGNALS = _BASE_EGP
-USDARS_SIGNALS = replace_asset(_BASE_BRL, "USDARS")
-USDBDT_SIGNALS = replace_asset(_BASE_BRL, "USDBDT")
-USDDZD_SIGNALS = replace_asset(_BASE_BRL, "USDDZD")
-USDIDR_SIGNALS = replace_asset(_BASE_COP, "USDIDR")
-USDINR_SIGNALS = replace_asset(_BASE_COP, "USDINR")
-USDNGN_SIGNALS = replace_asset(_BASE_COP, "USDNGN")
-USDPHP_SIGNALS = replace_asset(_BASE_EGP, "USDPHP")
-USDPKR_SIGNALS = replace_asset(_BASE_EGP, "USDPKR")
-USDTRY_SIGNALS = replace_asset(_BASE_EGP, "USDTRY")
-USDZAR_SIGNALS = replace_asset(_BASE_EGP, "USDZAR")
+USDBRL_SIGNALS = [
+    "🧪 USDBRL-OTC ☞ 08:39 🦅 CALL","🧪 USDBRL-OTC ☞ 08:45 🦅 CALL","🧪 USDBRL-OTC ☞ 08:51 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 08:56 🦅 CALL","🧪 USDBRL-OTC ☞ 08:59 🦅 CALL","🧪 USDBRL-OTC ☞ 09:03 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 09:07 🦅 CALL","🧪 USDBRL-OTC ☞ 09:10 🦅 CALL","🧪 USDBRL-OTC ☞ 09:14 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 09:17 🦅 CALL","🧪 USDBRL-OTC ☞ 09:20 🦅 CALL","🧪 USDBRL-OTC ☞ 09:25 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 09:28 🦅 CALL","🧪 USDBRL-OTC ☞ 09:35 🦅 CALL","🧪 USDBRL-OTC ☞ 09:41 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 09:47 🦅 CALL","🧪 USDBRL-OTC ☞ 09:52 🦅 CALL","🧪 USDBRL-OTC ☞ 09:57 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 10:03 🦅 PUT","🧪 USDBRL-OTC ☞ 10:10 🦅 PUT","🧪 USDBRL-OTC ☞ 10:14 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 10:18 🦅 PUT","🧪 USDBRL-OTC ☞ 10:22 🦅 PUT","🧪 USDBRL-OTC ☞ 10:26 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 10:30 🦅 PUT","🧪 USDBRL-OTC ☞ 10:34 🦅 PUT","🧪 USDBRL-OTC ☞ 10:37 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 10:44 🦅 PUT","🧪 USDBRL-OTC ☞ 10:49 🦅 PUT","🧪 USDBRL-OTC ☞ 10:53 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 10:57 🦅 PUT","🧪 USDBRL-OTC ☞ 11:03 🦅 CALL","🧪 USDBRL-OTC ☞ 11:07 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 11:10 🦅 PUT","🧪 USDBRL-OTC ☞ 11:17 🦅 CALL","🧪 USDBRL-OTC ☞ 11:23 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 11:29 🦅 CALL","🧪 USDBRL-OTC ☞ 11:34 🦅 PUT","🧪 USDBRL-OTC ☞ 11:39 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 11:46 🦅 CALL","🧪 USDBRL-OTC ☞ 11:49 🦅 PUT","🧪 USDBRL-OTC ☞ 11:54 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 11:59 🦅 CALL","🧪 USDBRL-OTC ☞ 12:04 🦅 CALL","🧪 USDBRL-OTC ☞ 12:10 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 12:17 🦅 CALL","🧪 USDBRL-OTC ☞ 12:20 🦅 CALL","🧪 USDBRL-OTC ☞ 12:25 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 12:32 🦅 CALL","🧪 USDBRL-OTC ☞ 12:35 🦅 CALL","🧪 USDBRL-OTC ☞ 12:38 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 12:42 🦅 CALL","🧪 USDBRL-OTC ☞ 12:45 🦅 PUT","🧪 USDBRL-OTC ☞ 12:52 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 12:58 🦅 CALL","🧪 USDBRL-OTC ☞ 13:03 🦅 PUT","🧪 USDBRL-OTC ☞ 13:06 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 13:13 🦅 CALL","🧪 USDBRL-OTC ☞ 13:20 🦅 PUT","🧪 USDBRL-OTC ☞ 13:25 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 13:29 🦅 CALL","🧪 USDBRL-OTC ☞ 13:33 🦅 PUT","🧪 USDBRL-OTC ☞ 13:39 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 13:42 🦅 PUT","🧪 USDBRL-OTC ☞ 13:46 🦅 PUT","🧪 USDBRL-OTC ☞ 13:52 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 13:59 🦅 CALL","🧪 USDBRL-OTC ☞ 14:05 🦅 CALL","🧪 USDBRL-OTC ☞ 14:09 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 14:13 🦅 PUT","🧪 USDBRL-OTC ☞ 14:17 🦅 CALL","🧪 USDBRL-OTC ☞ 14:24 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 14:28 🦅 CALL","🧪 USDBRL-OTC ☞ 14:34 🦅 CALL","🧪 USDBRL-OTC ☞ 14:41 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 14:47 🦅 PUT","🧪 USDBRL-OTC ☞ 14:53 🦅 PUT","🧪 USDBRL-OTC ☞ 14:59 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 15:05 🦅 PUT","🧪 USDBRL-OTC ☞ 15:10 🦅 CALL","🧪 USDBRL-OTC ☞ 15:14 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 15:18 🦅 CALL","🧪 USDBRL-OTC ☞ 15:24 🦅 PUT","🧪 USDBRL-OTC ☞ 15:30 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 15:36 🦅 CALL","🧪 USDBRL-OTC ☞ 15:39 🦅 PUT","🧪 USDBRL-OTC ☞ 15:42 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 15:45 🦅 CALL","🧪 USDBRL-OTC ☞ 15:52 🦅 PUT","🧪 USDBRL-OTC ☞ 15:57 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 16:03 🦅 PUT","🧪 USDBRL-OTC ☞ 16:10 🦅 PUT","🧪 USDBRL-OTC ☞ 16:16 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 16:22 🦅 CALL","🧪 USDBRL-OTC ☞ 16:28 🦅 PUT","🧪 USDBRL-OTC ☞ 16:35 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 16:41 🦅 CALL","🧪 USDBRL-OTC ☞ 16:44 🦅 PUT","🧪 USDBRL-OTC ☞ 16:47 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 16:52 🦅 CALL","🧪 USDBRL-OTC ☞ 16:57 🦅 PUT","🧪 USDBRL-OTC ☞ 17:00 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 17:05 🦅 CALL","🧪 USDBRL-OTC ☞ 17:10 🦅 PUT","🧪 USDBRL-OTC ☞ 17:16 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 17:20 🦅 PUT","🧪 USDBRL-OTC ☞ 17:25 🦅 CALL","🧪 USDBRL-OTC ☞ 17:30 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 17:36 🦅 PUT","🧪 USDBRL-OTC ☞ 17:42 🦅 CALL","🧪 USDBRL-OTC ☞ 17:48 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 17:54 🦅 CALL","🧪 USDBRL-OTC ☞ 18:01 🦅 CALL","🧪 USDBRL-OTC ☞ 18:07 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 18:11 🦅 CALL","🧪 USDBRL-OTC ☞ 18:18 🦅 PUT","🧪 USDBRL-OTC ☞ 18:21 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 18:24 🦅 CALL","🧪 USDBRL-OTC ☞ 18:31 🦅 CALL","🧪 USDBRL-OTC ☞ 18:35 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 18:38 🦅 CALL","🧪 USDBRL-OTC ☞ 18:42 🦅 CALL","🧪 USDBRL-OTC ☞ 18:49 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 18:54 🦅 PUT","🧪 USDBRL-OTC ☞ 18:58 🦅 CALL","🧪 USDBRL-OTC ☞ 19:02 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 19:07 🦅 PUT","🧪 USDBRL-OTC ☞ 19:10 🦅 PUT","🧪 USDBRL-OTC ☞ 19:14 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 19:19 🦅 CALL","🧪 USDBRL-OTC ☞ 19:23 🦅 CALL","🧪 USDBRL-OTC ☞ 19:28 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 19:33 🦅 PUT","🧪 USDBRL-OTC ☞ 19:39 🦅 PUT","🧪 USDBRL-OTC ☞ 19:46 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 19:51 🦅 CALL","🧪 USDBRL-OTC ☞ 19:57 🦅 PUT","🧪 USDBRL-OTC ☞ 20:00 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 20:05 🦅 CALL","🧪 USDBRL-OTC ☞ 20:12 🦅 PUT","🧪 USDBRL-OTC ☞ 20:18 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 20:21 🦅 PUT","🧪 USDBRL-OTC ☞ 20:26 🦅 PUT","🧪 USDBRL-OTC ☞ 20:30 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 20:35 🦅 PUT","🧪 USDBRL-OTC ☞ 20:41 🦅 CALL","🧪 USDBRL-OTC ☞ 20:47 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 20:50 🦅 CALL","🧪 USDBRL-OTC ☞ 20:57 🦅 PUT","🧪 USDBRL-OTC ☞ 21:04 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 21:09 🦅 PUT","🧪 USDBRL-OTC ☞ 21:15 🦅 CALL","🧪 USDBRL-OTC ☞ 21:22 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 21:29 🦅 PUT","🧪 USDBRL-OTC ☞ 21:36 🦅 CALL","🧪 USDBRL-OTC ☞ 21:40 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 21:46 🦅 PUT","🧪 USDBRL-OTC ☞ 21:53 🦅 CALL","🧪 USDBRL-OTC ☞ 21:56 🦅 PUT",
+    "🧪 USDBRL-OTC ☞ 22:03 🦅 PUT","🧪 USDBRL-OTC ☞ 22:08 🦅 PUT","🧪 USDBRL-OTC ☞ 22:14 🦅 CALL",
+    "🧪 USDBRL-OTC ☞ 22:19 🦅 PUT","🧪 USDBRL-OTC ☞ 22:22 🦅 CALL",
+]
 
-# ==================== ASSET CONFIG ====================
-ASSET_CONFIG = {
-    "USDBRL": {"list": USDBRL_SIGNALS, "flag": "🇧🇷", "name": "USDBRL", "group": "BRL"},
-    "USDARS": {"list": USDARS_SIGNALS, "flag": "🇦🇷", "name": "USDARS", "group": "BRL"},
-    "USDBDT": {"list": USDBDT_SIGNALS, "flag": "🇧🇩", "name": "USDBDT", "group": "BRL"},
-    "USDDZD": {"list": USDDZD_SIGNALS, "flag": "🇩🇿", "name": "USDDZD", "group": "BRL"},
-    "USDCOP": {"list": USDCOP_SIGNALS, "flag": "🇨🇴", "name": "USDCOP", "group": "COP"},
-    "USDIDR": {"list": USDIDR_SIGNALS, "flag": "🇮🇩", "name": "USDIDR", "group": "COP"},
-    "USDINR": {"list": USDINR_SIGNALS, "flag": "🇮🇳", "name": "USDINR", "group": "COP"},
-    "USDNGN": {"list": USDNGN_SIGNALS, "flag": "🇳🇬", "name": "USDNGN", "group": "COP"},
-    "USDEGP": {"list": USDEGP_SIGNALS, "flag": "🇪🇬", "name": "USDEGP", "group": "EGP"},
-    "USDPHP": {"list": USDPHP_SIGNALS, "flag": "🇵🇭", "name": "USDPHP", "group": "EGP"},
-    "USDPKR": {"list": USDPKR_SIGNALS, "flag": "🇵🇰", "name": "USDPKR", "group": "EGP"},
-    "USDTRY": {"list": USDTRY_SIGNALS, "flag": "🇹🇷", "name": "USDTRY", "group": "EGP"},
-    "USDZAR": {"list": USDZAR_SIGNALS, "flag": "🇿🇦", "name": "USDZAR", "group": "EGP"},
-}
+USDCOP_SIGNALS = [
+    "🧪 USDCOP-OTC ☞ 08:20 🦅 CALL","🧪 USDCOP-OTC ☞ 08:26 🦅 PUT","🧪 USDCOP-OTC ☞ 08:31 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 08:34 🦅 CALL","🧪 USDCOP-OTC ☞ 08:40 🦅 PUT","🧪 USDCOP-OTC ☞ 08:44 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 08:50 🦅 PUT","🧪 USDCOP-OTC ☞ 08:57 🦅 CALL","🧪 USDCOP-OTC ☞ 09:03 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 09:08 🦅 CALL","🧪 USDCOP-OTC ☞ 09:12 🦅 CALL","🧪 USDCOP-OTC ☞ 09:18 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 09:24 🦅 PUT","🧪 USDCOP-OTC ☞ 09:27 🦅 PUT","🧪 USDCOP-OTC ☞ 09:30 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 09:36 🦅 CALL","🧪 USDCOP-OTC ☞ 09:42 🦅 CALL","🧪 USDCOP-OTC ☞ 09:46 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 09:53 🦅 PUT","🧪 USDCOP-OTC ☞ 09:56 🦅 PUT","🧪 USDCOP-OTC ☞ 09:59 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 10:06 🦅 PUT","🧪 USDCOP-OTC ☞ 10:12 🦅 CALL","🧪 USDCOP-OTC ☞ 10:19 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 10:22 🦅 CALL","🧪 USDCOP-OTC ☞ 10:27 🦅 PUT","🧪 USDCOP-OTC ☞ 10:34 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 10:41 🦅 PUT","🧪 USDCOP-OTC ☞ 10:46 🦅 PUT","🧪 USDCOP-OTC ☞ 10:50 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 10:53 🦅 PUT","🧪 USDCOP-OTC ☞ 10:59 🦅 CALL","🧪 USDCOP-OTC ☞ 11:05 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 11:09 🦅 PUT","🧪 USDCOP-OTC ☞ 11:12 🦅 PUT","🧪 USDCOP-OTC ☞ 11:17 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 11:24 🦅 CALL","🧪 USDCOP-OTC ☞ 11:29 🦅 CALL","🧪 USDCOP-OTC ☞ 11:35 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 11:38 🦅 CALL","🧪 USDCOP-OTC ☞ 11:43 🦅 CALL","🧪 USDCOP-OTC ☞ 11:50 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 11:54 🦅 PUT","🧪 USDCOP-OTC ☞ 11:58 🦅 PUT","🧪 USDCOP-OTC ☞ 12:05 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 12:10 🦅 CALL","🧪 USDCOP-OTC ☞ 12:14 🦅 CALL","🧪 USDCOP-OTC ☞ 12:20 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 12:23 🦅 CALL","🧪 USDCOP-OTC ☞ 12:26 🦅 CALL","🧪 USDCOP-OTC ☞ 12:29 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 12:34 🦅 CALL","🧪 USDCOP-OTC ☞ 12:37 🦅 CALL","🧪 USDCOP-OTC ☞ 12:40 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 12:43 🦅 CALL","🧪 USDCOP-OTC ☞ 12:47 🦅 CALL","🧪 USDCOP-OTC ☞ 12:54 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 12:59 🦅 PUT","🧪 USDCOP-OTC ☞ 13:05 🦅 PUT","🧪 USDCOP-OTC ☞ 13:10 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 13:14 🦅 PUT","🧪 USDCOP-OTC ☞ 13:19 🦅 PUT","🧪 USDCOP-OTC ☞ 13:24 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 13:27 🦅 PUT","🧪 USDCOP-OTC ☞ 13:30 🦅 CALL","🧪 USDCOP-OTC ☞ 13:36 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 13:41 🦅 PUT","🧪 USDCOP-OTC ☞ 13:46 🦅 CALL","🧪 USDCOP-OTC ☞ 13:49 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 13:55 🦅 CALL","🧪 USDCOP-OTC ☞ 13:58 🦅 CALL","🧪 USDCOP-OTC ☞ 14:05 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 14:11 🦅 PUT","🧪 USDCOP-OTC ☞ 14:14 🦅 PUT","🧪 USDCOP-OTC ☞ 14:19 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 14:25 🦅 PUT","🧪 USDCOP-OTC ☞ 14:30 🦅 CALL","🧪 USDCOP-OTC ☞ 14:35 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 14:41 🦅 PUT","🧪 USDCOP-OTC ☞ 14:47 🦅 CALL","🧪 USDCOP-OTC ☞ 14:54 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 14:57 🦅 CALL","🧪 USDCOP-OTC ☞ 15:03 🦅 PUT","🧪 USDCOP-OTC ☞ 15:07 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 15:13 🦅 PUT","🧪 USDCOP-OTC ☞ 15:19 🦅 PUT","🧪 USDCOP-OTC ☞ 15:24 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 15:29 🦅 CALL","🧪 USDCOP-OTC ☞ 15:33 🦅 PUT","🧪 USDCOP-OTC ☞ 15:40 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 15:44 🦅 PUT","🧪 USDCOP-OTC ☞ 15:50 🦅 CALL","🧪 USDCOP-OTC ☞ 15:56 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 16:00 🦅 CALL","🧪 USDCOP-OTC ☞ 16:03 🦅 PUT","🧪 USDCOP-OTC ☞ 16:06 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 16:09 🦅 CALL","🧪 USDCOP-OTC ☞ 16:13 🦅 PUT","🧪 USDCOP-OTC ☞ 16:20 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 16:27 🦅 CALL","🧪 USDCOP-OTC ☞ 16:30 🦅 CALL","🧪 USDCOP-OTC ☞ 16:34 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 16:37 🦅 PUT","🧪 USDCOP-OTC ☞ 16:43 🦅 PUT","🧪 USDCOP-OTC ☞ 16:50 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 16:53 🦅 CALL","🧪 USDCOP-OTC ☞ 16:56 🦅 CALL","🧪 USDCOP-OTC ☞ 17:03 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 17:08 🦅 CALL","🧪 USDCOP-OTC ☞ 17:14 🦅 PUT","🧪 USDCOP-OTC ☞ 17:21 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 17:27 🦅 CALL","🧪 USDCOP-OTC ☞ 17:33 🦅 CALL","🧪 USDCOP-OTC ☞ 17:38 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 17:41 🦅 PUT","🧪 USDCOP-OTC ☞ 17:44 🦅 PUT","🧪 USDCOP-OTC ☞ 17:51 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 17:56 🦅 PUT","🧪 USDCOP-OTC ☞ 18:02 🦅 PUT","🧪 USDCOP-OTC ☞ 18:06 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 18:13 🦅 PUT","🧪 USDCOP-OTC ☞ 18:16 🦅 PUT","🧪 USDCOP-OTC ☞ 18:21 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 18:26 🦅 CALL","🧪 USDCOP-OTC ☞ 18:30 🦅 PUT","🧪 USDCOP-OTC ☞ 18:33 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 18:40 🦅 PUT","🧪 USDCOP-OTC ☞ 18:44 🦅 PUT","🧪 USDCOP-OTC ☞ 18:48 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 18:52 🦅 CALL","🧪 USDCOP-OTC ☞ 18:57 🦅 CALL","🧪 USDCOP-OTC ☞ 19:02 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 19:09 🦅 CALL","🧪 USDCOP-OTC ☞ 19:13 🦅 PUT","🧪 USDCOP-OTC ☞ 19:20 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 19:26 🦅 PUT","🧪 USDCOP-OTC ☞ 19:29 🦅 PUT","🧪 USDCOP-OTC ☞ 19:34 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 19:37 🦅 CALL","🧪 USDCOP-OTC ☞ 19:40 🦅 PUT","🧪 USDCOP-OTC ☞ 19:43 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 19:50 🦅 PUT","🧪 USDCOP-OTC ☞ 19:54 🦅 CALL","🧪 USDCOP-OTC ☞ 19:57 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 20:02 🦅 PUT","🧪 USDCOP-OTC ☞ 20:05 🦅 PUT","🧪 USDCOP-OTC ☞ 20:08 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 20:14 🦅 PUT","🧪 USDCOP-OTC ☞ 20:17 🦅 CALL","🧪 USDCOP-OTC ☞ 20:21 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 20:28 🦅 PUT","🧪 USDCOP-OTC ☞ 20:32 🦅 PUT","🧪 USDCOP-OTC ☞ 20:36 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 20:42 🦅 CALL","🧪 USDCOP-OTC ☞ 20:46 🦅 CALL","🧪 USDCOP-OTC ☞ 20:50 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 20:55 🦅 PUT","🧪 USDCOP-OTC ☞ 21:02 🦅 CALL","🧪 USDCOP-OTC ☞ 21:06 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 21:11 🦅 PUT","🧪 USDCOP-OTC ☞ 21:16 🦅 CALL","🧪 USDCOP-OTC ☞ 21:22 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 21:27 🦅 PUT","🧪 USDCOP-OTC ☞ 21:33 🦅 PUT","🧪 USDCOP-OTC ☞ 21:38 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 21:41 🦅 PUT","🧪 USDCOP-OTC ☞ 21:47 🦅 PUT","🧪 USDCOP-OTC ☞ 21:52 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 21:56 🦅 CALL","🧪 USDCOP-OTC ☞ 22:03 🦅 CALL","🧪 USDCOP-OTC ☞ 22:08 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 22:11 🦅 PUT","🧪 USDCOP-OTC ☞ 22:18 🦅 CALL","🧪 USDCOP-OTC ☞ 22:25 🦅 CALL",
+    "🧪 USDCOP-OTC ☞ 22:28 🦅 CALL","🧪 USDCOP-OTC ☞ 22:33 🦅 CALL","🧪 USDCOP-OTC ☞ 22:37 🦅 PUT",
+    "🧪 USDCOP-OTC ☞ 22:41 🦅 PUT","🧪 USDCOP-OTC ☞ 22:46 🦅 PUT","🧪 USDCOP-OTC ☞ 22:53 🦅 CALL",
+]
 
 # ==================== TRACKER ====================
 class WinLossTracker:
@@ -325,8 +283,7 @@ def get_ud(user_id):
     if user_id not in user_data:
         user_data[user_id] = {
             'scheduled_signals': {}, 'active_tasks': {}, 'pending_results': {},
-            'martingale_step': {}, 'channels': [DEFAULT_CHANNEL], 'current_channel': DEFAULT_CHANNEL,
-            'asset_page': 0
+            'martingale_step': {}, 'channels': [DEFAULT_CHANNEL], 'current_channel': DEFAULT_CHANNEL
         }
     return user_data[user_id]
 
@@ -378,35 +335,14 @@ def main_menu():
         [InlineKeyboardButton("🗑️ Clear", callback_data="clear")]
     ])
 
-def asset_menu(page=0):
-    assets = list(ASSET_CONFIG.keys())
-    total_pages = 2
-    start = page * 9
-    end = start + 9
-    page_assets = assets[start:end]
-    
-    buttons = []
-    row = []
-    for i, a in enumerate(page_assets):
-        cfg = ASSET_CONFIG[a]
-        row.append(InlineKeyboardButton(f"{cfg['flag']} {cfg['name']}", callback_data=f"asset_{a}"))
-        if len(row) == 3:
-            buttons.append(row)
-            row = []
-    if row: buttons.append(row)
-    
-    if page == 1:
-        buttons.append([InlineKeyboardButton("🔀 MIXED (All 12 Assets)", callback_data="asset_MIXED")])
-    
-    nav = []
-    if page == 0:
-        nav.append(InlineKeyboardButton("➡️ Next", callback_data="page_1"))
-    else:
-        nav.append(InlineKeyboardButton("⬅️ Back", callback_data="page_0"))
-    nav.append(InlineKeyboardButton("🔙 Menu", callback_data="start"))
-    buttons.append(nav)
-    
-    return InlineKeyboardMarkup(buttons)
+def asset_menu():
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton("🇧🇷 USDBRL", callback_data="asset_USDBRL")],
+        [InlineKeyboardButton("🇨🇴 USDCOP", callback_data="asset_USDCOP")],
+        [InlineKeyboardButton("🇪🇬 USDEGP", callback_data="asset_USDEGP")],
+        [InlineKeyboardButton("🔀 MIXED (BRL→COP→EGP)", callback_data="asset_MIXED")],
+        [InlineKeyboardButton("🔙 Back", callback_data="start")]
+    ])
 
 def ch_kb(user_id):
     ud = get_ud(user_id); cur = ud['current_channel']
@@ -458,10 +394,12 @@ def fmt_signal(sig, sid, ch):
 def fmt_result(sig, result, sid, ch):
     a = sig['asset']; t = sig['converted_time']; d = sig['direction']; m = sig.get('martingale_step', 1)
     pair = a.replace('-OTC', '')
+    
     if result == 'WIN': ri = "✅"; rt = "WINNER 🏆"; extra = ""
     elif result == 'LOSS': ri = "❌"; rt = "LOSS"; extra = ""
     elif result == 'MTG1_WIN': ri = "🔄"; rt = "MARTINGALE 1 WIN 🏆"; extra = f"\n🔄 Martingale Step {m} Completed!"
     else: ri = "⚠️"; rt = "AVOID"; extra = "\n⚠️ Signal Avoided"
+    
     return f"""
 ╔══════════════════════════════════╗
 ║    📊 SIGNAL RESULT     ║
@@ -489,23 +427,20 @@ async def callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif d.startswith('w_'): sid = d[2:]; result = 'WIN'
         elif d.startswith('l_'): sid = d[2:]; result = 'LOSS'
         else: sid = d[2:]; result = 'AVOID'
+        
         if sid in processed_results: await q.edit_message_text("⚠️ Already recorded!"); return
         if sid not in ud['pending_results']: await q.edit_message_text("⚠️ Not found"); return
+        
         info = ud['pending_results'][sid]; sd = info['signal']
         tracker.add_result(sd, result, sid)
         ch = ud['current_channel']
         try: await context.bot.send_message(chat_id=ch, text=fmt_result(sd, result, sid, ch))
         except: pass
+        
         emap = {'WIN': '✅ WIN', 'LOSS': '❌ LOSS', 'MTG1_WIN': '🔄 MTG1 WIN', 'AVOID': '⚠️ AVOID'}
         sh = sid[-4:] if len(sid) >= 4 else sid
         await q.edit_message_text(f"{emap[result]} #{sh}\n📊 {sd['asset']}\n⏰ {sd['converted_time']}\n📈 WR:{tracker.get_rate():.1f}%")
         if sid in ud['pending_results']: del ud['pending_results'][sid]
-        return
-    
-    if d.startswith('page_'):
-        page = int(d[5:])
-        ud['asset_page'] = page
-        await q.edit_message_text(f"📊 Select Asset (Page {page+1}/2):", reply_markup=asset_menu(page))
         return
     
     if d.startswith('asset_'):
@@ -520,8 +455,10 @@ async def callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if ch == 'skip': sel = ud['current_channel']
         else: sel = ch; ud['current_channel'] = sel
         if sel not in ud['channels']: ud['channels'].insert(0, sel)
+        
         asset = context.user_data.get('selected_asset', 'MIXED')
         act = context.user_data.get('pact', '')
+        
         if act == 'history':
             hist = tracker.get_history_text(30)
             try:
@@ -530,14 +467,14 @@ async def callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except: await q.edit_message_text("❌ Failed", reply_markup=main_menu())
         else:
             is_mixed = (asset == 'MIXED')
-            await q.edit_message_text(f"✅ {sel}\n⚙️ Loading {asset}..." + ("\n🔄 12 Assets Rotation" if is_mixed else ""))
+            await q.edit_message_text(f"✅ {sel}\n⚙️ Loading {asset}..." + ("\n🔄 BRL→COP→EGP rotation" if is_mixed else ""))
             await load_asset_signals(context.bot, uid, sel, asset, is_mixed)
         context.user_data['pact'] = ''
         return
     
     if d == "start":
         ch = ud['current_channel']
-        txt = f"""🤖 SIGNAL BOT v25 FINAL
+        txt = f"""🤖 SIGNAL BOT v22
 
 👤 {uid} | 📢 {ch}
 📊 Active: {len(ud['scheduled_signals'])} | Pending: {len(ud['pending_results'])}
@@ -546,7 +483,7 @@ async def callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await q.edit_message_text(txt, reply_markup=main_menu())
         return
     
-    if d == "load": await q.edit_message_text("📊 Select Asset (Page 1/2):", reply_markup=asset_menu(0)); return
+    if d == "load": await q.edit_message_text("📊 Select Asset:", reply_markup=asset_menu()); return
     if d == "signals":
         if not ud['scheduled_signals']: await q.edit_message_text("📋 None", reply_markup=main_menu()); return
         ss = sorted(ud['scheduled_signals'].items(), key=lambda x: x[1]['scheduled_time'])
@@ -589,6 +526,7 @@ async def callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ==================== MESSAGE HANDLER ====================
 async def msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = update.effective_user.id; ud = get_ud(uid)
+    
     if context.user_data.get('wait'):
         txt = update.message.text.strip()
         if not txt.startswith('@'): txt = '@' + txt
@@ -597,11 +535,12 @@ async def msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data['wait'] = False
         asset = context.user_data.get('selected_asset', 'MIXED')
         is_mixed = (asset == 'MIXED')
-        await update.message.reply_text(f"✅ {txt}\n⚙️ Loading {asset}..." + ("\n🔄 12 Assets Rotation" if is_mixed else ""))
+        await update.message.reply_text(f"✅ {txt}\n⚙️ Loading {asset}..." + ("\n🔄 BRL→COP→EGP" if is_mixed else ""))
         await load_asset_signals(context.bot, uid, txt, asset, is_mixed)
         return
+    
     ch = ud['current_channel']
-    txt = f"""🤖 SIGNAL BOT v25 FINAL
+    txt = f"""🤖 SIGNAL BOT v22
 
 👤 {uid} | 📢 {ch}
 📊 Active: {len(ud['scheduled_signals'])} | Pending: {len(ud['pending_results'])}
@@ -609,74 +548,62 @@ async def msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
 👇 Select:"""
     await update.message.reply_text(txt, reply_markup=main_menu())
 
-# ==================== LOAD SIGNALS - WITH BALANCE ASSETS IN MIXED ====================
+# ==================== LOAD SIGNALS WITH ROTATION ====================
 async def load_asset_signals(bot, uid, ch, asset, is_mixed=False):
     ud = get_ud(uid); ud['current_channel'] = ch
     
-    if asset == 'MIXED':
-        # Group assets by their base pattern
-        brl_group = ['USDBRL', 'USDARS', 'USDBDT', 'USDDZD']
-        cop_group = ['USDCOP', 'USDIDR', 'USDINR', 'USDNGN']
-        egp_group = ['USDEGP', 'USDPHP', 'USDPKR', 'USDTRY', 'USDZAR']
+    if asset == 'USDBRL': signal_list = USDBRL_SIGNALS
+    elif asset == 'USDCOP': signal_list = USDCOP_SIGNALS
+    elif asset == 'USDEGP': signal_list = USDEGP_SIGNALS
+    else:  # MIXED with rotation BRL→COP→EGP
+        # Separate by asset
+        brl = parse_signals(USDBRL_SIGNALS)
+        cop = parse_signals(USDCOP_SIGNALS)
+        egp = parse_signals(USDEGP_SIGNALS)
         
-        # Parse all signals from all assets
-        all_signals = []
-        for cfg in ASSET_CONFIG.values():
-            all_signals.extend(parse_signals(cfg['list']))
+        # Sort each by time
+        brl.sort(key=lambda x: x['time'])
+        cop.sort(key=lambda x: x['time'])
+        egp.sort(key=lambda x: x['time'])
         
-        # Group by time
-        time_groups = {}
-        for sig in all_signals:
-            t = sig['time']
-            if t not in time_groups:
-                time_groups[t] = {'BRL': [], 'COP': [], 'EGP': []}
-            asset_name = sig['asset'].replace('-OTC', '')
-            # Find which group this asset belongs to
-            for g, assets in [('BRL', brl_group), ('COP', cop_group), ('EGP', egp_group)]:
-                if asset_name in assets:
-                    time_groups[t][g].append(sig)
-                    break
-        
-        # Build rotated signal list: at each time, pick one from each group in rotation
-        sorted_times = sorted(time_groups.keys())
-        rotated_signals = []
-        group_order = ['EGP', 'COP', 'BRL']  # Rotation order
-        group_index = 0
-        
-        for t in sorted_times:
-            groups = time_groups[t]
-            # Try current group first, then next, then next
-            for attempt in range(3):
-                g = group_order[(group_index + attempt) % 3]
-                if groups[g]:
-                    rotated_signals.append(groups[g][0])
-                    group_index = (group_index + attempt + 1) % 3
-                    break
+        # Interleave: BRL → COP → EGP → BRL → ...
+        parsed = []
+        max_len = max(len(brl), len(cop), len(egp))
+        for i in range(max_len):
+            if i < len(brl): parsed.append(brl[i])
+            if i < len(cop): parsed.append(cop[i])
+            if i < len(egp): parsed.append(egp[i])
         
         ok = 0; fl = 0; last_time = None
-        for sig in rotated_signals:
+        
+        for sig in parsed:
             ct = convert_time(sig['time']); cf = get_conf(); mg = get_mg_step(uid, sig['asset'])
             sd = {'asset': sig['asset'], 'time': sig['time'], 'original_time': sig['time'], 'converted_time': ct, 'direction': sig['direction'], 'confidence': cf, 'martingale_step': mg}
+            
             o, sid, last_time = await sched_with_gap(bot, uid, sd, last_time)
             if o: ok += 1
             else: fl += 1
         
-        await bot.send_message(chat_id=uid, text=f"✅ {ok} MIXED signals!\n⚠️ {fl} skipped\n📢 {ch}\n⏰ UTC+5:30\n🔄 12 Assets Rotating (EGP→COP→BRL)", reply_markup=main_menu())
+        await bot.send_message(chat_id=uid, text=f"✅ {ok} MIXED signals!\n⚠️ {fl} failed\n📢 {ch}\n⏰ UTC+5:30\n🔄 BRL→COP→EGP rotation", reply_markup=main_menu())
         return
     
     # Single asset
-    cfg = ASSET_CONFIG.get(asset)
-    if not cfg: return
-    parsed = parse_signals(cfg['list'])
+    parsed = parse_signals(signal_list)
     parsed.sort(key=lambda x: x['time'])
-    ok = 0; fl = 0
+    
+    ok = 0; fl = 0; last_time = None
+    
     for sig in parsed:
         ct = convert_time(sig['time']); cf = get_conf(); mg = get_mg_step(uid, sig['asset'])
         sd = {'asset': sig['asset'], 'time': sig['time'], 'original_time': sig['time'], 'converted_time': ct, 'direction': sig['direction'], 'confidence': cf, 'martingale_step': mg}
-        o, sid = await sched_normal(bot, uid, sd)
+        
+        if is_mixed: o, sid, last_time = await sched_with_gap(bot, uid, sd, last_time)
+        else: o, sid = await sched_normal(bot, uid, sd)
+        
         if o: ok += 1
         else: fl += 1
-    await bot.send_message(chat_id=uid, text=f"✅ {ok} {asset} signals!\n⚠️ {fl} skipped (past)\n📢 {ch}\n⏰ UTC+5:30", reply_markup=main_menu())
+    
+    await bot.send_message(chat_id=uid, text=f"✅ {ok} {asset} signals!\n⚠️ {fl} failed\n📢 {ch}\n⏰ UTC+5:30" + ("\n🔄 Rotation" if is_mixed else ""), reply_markup=main_menu())
 
 # ==================== SCHEDULING ====================
 async def sched_normal(bot, uid, sd):
@@ -686,7 +613,7 @@ async def sched_normal(bot, uid, sd):
         now = datetime.utcnow() + timedelta(hours=5, minutes=30)
         tgt = now.replace(hour=h, minute=m, second=0, microsecond=0)
         pt = tgt - timedelta(minutes=1)
-        if pt <= now: return False, None
+        if pt <= now: pt += timedelta(days=1)
         delay = (pt - now).total_seconds()
         if delay < 0: return False, None
         sid = f"{sd['asset']}_{sd['converted_time']}_{random.randint(10000,99999)}"
@@ -703,12 +630,15 @@ async def sched_with_gap(bot, uid, sd, last_time):
         now = datetime.utcnow() + timedelta(hours=5, minutes=30)
         tgt = now.replace(hour=h, minute=m, second=0, microsecond=0)
         pt = tgt - timedelta(minutes=1)
+        
         if last_time is not None:
             min_allowed = last_time + timedelta(minutes=MTG_GAP_MINUTES)
             if pt < min_allowed: pt = min_allowed
-        if pt <= now: return False, None, last_time
+        
+        if pt <= now: pt += timedelta(days=1)
         delay = (pt - now).total_seconds()
         if delay < 0: return False, None, last_time
+        
         sid = f"{sd['asset']}_{sd['converted_time']}_{random.randint(10000,99999)}"
         ud['scheduled_signals'][sid] = {'signal': sd, 'scheduled_time': pt}
         task = asyncio.create_task(post(bot, uid, sid, sd, delay))
@@ -740,8 +670,8 @@ def main():
     tracker.load()
     print(f"""
 ╔══════════════════════════════════╗
-║  🤖 SIGNAL BOT v25 FINAL    ║
-║  12 Assets • ALL Balanced  ║
+║  🤖 SIGNAL BOT v22 FINAL    ║
+║  New Signals • Rotation    ║
 ╚══════════════════════════════════╝
 ✅ Ready!
 """)

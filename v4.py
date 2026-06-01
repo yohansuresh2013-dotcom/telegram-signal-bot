@@ -25,8 +25,9 @@ user_data = {}
 processed_results = {}
 MTG_GAP_MINUTES = 3
 
-# ==================== HELPER: Replace asset name ====================
+# ==================== HELPER: Replace asset name in signal ====================
 def replace_asset(signal_list, new_asset):
+    """Replace USDBRL/USDCOP/USDEGP with new asset name in all signals"""
     result = []
     for s in signal_list:
         s = s.replace("USDBRL-OTC", f"{new_asset}-OTC")
@@ -237,19 +238,19 @@ USDZAR_SIGNALS = replace_asset(_BASE_EGP, "USDZAR")
 
 # ==================== ASSET CONFIG ====================
 ASSET_CONFIG = {
-    "USDBRL": {"list": USDBRL_SIGNALS, "flag": "🇧🇷", "name": "USDBRL", "group": "BRL"},
-    "USDARS": {"list": USDARS_SIGNALS, "flag": "🇦🇷", "name": "USDARS", "group": "BRL"},
-    "USDBDT": {"list": USDBDT_SIGNALS, "flag": "🇧🇩", "name": "USDBDT", "group": "BRL"},
-    "USDDZD": {"list": USDDZD_SIGNALS, "flag": "🇩🇿", "name": "USDDZD", "group": "BRL"},
-    "USDCOP": {"list": USDCOP_SIGNALS, "flag": "🇨🇴", "name": "USDCOP", "group": "COP"},
-    "USDIDR": {"list": USDIDR_SIGNALS, "flag": "🇮🇩", "name": "USDIDR", "group": "COP"},
-    "USDINR": {"list": USDINR_SIGNALS, "flag": "🇮🇳", "name": "USDINR", "group": "COP"},
-    "USDNGN": {"list": USDNGN_SIGNALS, "flag": "🇳🇬", "name": "USDNGN", "group": "COP"},
-    "USDEGP": {"list": USDEGP_SIGNALS, "flag": "🇪🇬", "name": "USDEGP", "group": "EGP"},
-    "USDPHP": {"list": USDPHP_SIGNALS, "flag": "🇵🇭", "name": "USDPHP", "group": "EGP"},
-    "USDPKR": {"list": USDPKR_SIGNALS, "flag": "🇵🇰", "name": "USDPKR", "group": "EGP"},
-    "USDTRY": {"list": USDTRY_SIGNALS, "flag": "🇹🇷", "name": "USDTRY", "group": "EGP"},
-    "USDZAR": {"list": USDZAR_SIGNALS, "flag": "🇿🇦", "name": "USDZAR", "group": "EGP"},
+    "USDBRL": {"list": USDBRL_SIGNALS, "flag": "🇧🇷", "name": "USDBRL"},
+    "USDCOP": {"list": USDCOP_SIGNALS, "flag": "🇨🇴", "name": "USDCOP"},
+    "USDEGP": {"list": USDEGP_SIGNALS, "flag": "🇪🇬", "name": "USDEGP"},
+    "USDARS": {"list": USDARS_SIGNALS, "flag": "🇦🇷", "name": "USDARS"},
+    "USDBDT": {"list": USDBDT_SIGNALS, "flag": "🇧🇩", "name": "USDBDT"},
+    "USDDZD": {"list": USDDZD_SIGNALS, "flag": "🇩🇿", "name": "USDDZD"},
+    "USDIDR": {"list": USDIDR_SIGNALS, "flag": "🇮🇩", "name": "USDIDR"},
+    "USDINR": {"list": USDINR_SIGNALS, "flag": "🇮🇳", "name": "USDINR"},
+    "USDNGN": {"list": USDNGN_SIGNALS, "flag": "🇳🇬", "name": "USDNGN"},
+    "USDPHP": {"list": USDPHP_SIGNALS, "flag": "🇵🇭", "name": "USDPHP"},
+    "USDPKR": {"list": USDPKR_SIGNALS, "flag": "🇵🇰", "name": "USDPKR"},
+    "USDTRY": {"list": USDTRY_SIGNALS, "flag": "🇹🇷", "name": "USDTRY"},
+    "USDZAR": {"list": USDZAR_SIGNALS, "flag": "🇿🇦", "name": "USDZAR"},
 }
 
 # ==================== TRACKER ====================
@@ -395,9 +396,11 @@ def asset_menu(page=0):
             row = []
     if row: buttons.append(row)
     
+    # MIXED only on page 1 (second page)
     if page == 1:
         buttons.append([InlineKeyboardButton("🔀 MIXED (All 12 Assets)", callback_data="asset_MIXED")])
     
+    # Navigation
     nav = []
     if page == 0:
         nav.append(InlineKeyboardButton("➡️ Next", callback_data="page_1"))
@@ -484,6 +487,7 @@ async def callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await q.answer()
     ud = get_ud(uid)
     
+    # Result buttons
     if d.startswith('w_') or d.startswith('l_') or d.startswith('mw_') or d.startswith('a_'):
         if d.startswith('mw_'): sid = d[3:]; result = 'MTG1_WIN'
         elif d.startswith('w_'): sid = d[2:]; result = 'WIN'
@@ -502,18 +506,21 @@ async def callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if sid in ud['pending_results']: del ud['pending_results'][sid]
         return
     
+    # Page navigation
     if d.startswith('page_'):
         page = int(d[5:])
         ud['asset_page'] = page
         await q.edit_message_text(f"📊 Select Asset (Page {page+1}/2):", reply_markup=asset_menu(page))
         return
     
+    # Asset selection
     if d.startswith('asset_'):
         asset = d[6:]
         context.user_data['selected_asset'] = asset
         await q.edit_message_text(f"📢 Select channel for {asset}:", reply_markup=ch_kb(uid))
         return
     
+    # Channel select
     if d.startswith('ch_'):
         ch = d[3:]
         if ch == 'new': context.user_data['wait'] = True; await q.edit_message_text("📝 Send username:\n@my_channel"); return
@@ -530,14 +537,15 @@ async def callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except: await q.edit_message_text("❌ Failed", reply_markup=main_menu())
         else:
             is_mixed = (asset == 'MIXED')
-            await q.edit_message_text(f"✅ {sel}\n⚙️ Loading {asset}..." + ("\n🔄 12 Assets Rotation" if is_mixed else ""))
+            await q.edit_message_text(f"✅ {sel}\n⚙️ Loading {asset}..." + ("\n🔄 12 Assets" if is_mixed else ""))
             await load_asset_signals(context.bot, uid, sel, asset, is_mixed)
         context.user_data['pact'] = ''
         return
     
+    # Menu
     if d == "start":
         ch = ud['current_channel']
-        txt = f"""🤖 SIGNAL BOT v25 FINAL
+        txt = f"""🤖 SIGNAL BOT v24
 
 👤 {uid} | 📢 {ch}
 📊 Active: {len(ud['scheduled_signals'])} | Pending: {len(ud['pending_results'])}
@@ -597,11 +605,11 @@ async def msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data['wait'] = False
         asset = context.user_data.get('selected_asset', 'MIXED')
         is_mixed = (asset == 'MIXED')
-        await update.message.reply_text(f"✅ {txt}\n⚙️ Loading {asset}..." + ("\n🔄 12 Assets Rotation" if is_mixed else ""))
+        await update.message.reply_text(f"✅ {txt}\n⚙️ Loading {asset}..." + ("\n🔄 12 Assets" if is_mixed else ""))
         await load_asset_signals(context.bot, uid, txt, asset, is_mixed)
         return
     ch = ud['current_channel']
-    txt = f"""🤖 SIGNAL BOT v25 FINAL
+    txt = f"""🤖 SIGNAL BOT v24
 
 👤 {uid} | 📢 {ch}
 📊 Active: {len(ud['scheduled_signals'])} | Pending: {len(ud['pending_results'])}
@@ -609,59 +617,36 @@ async def msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
 👇 Select:"""
     await update.message.reply_text(txt, reply_markup=main_menu())
 
-# ==================== LOAD SIGNALS - WITH BALANCE ASSETS IN MIXED ====================
+# ==================== LOAD SIGNALS ====================
 async def load_asset_signals(bot, uid, ch, asset, is_mixed=False):
     ud = get_ud(uid); ud['current_channel'] = ch
     
     if asset == 'MIXED':
-        # Group assets by their base pattern
-        brl_group = ['USDBRL', 'USDARS', 'USDBDT', 'USDDZD']
-        cop_group = ['USDCOP', 'USDIDR', 'USDINR', 'USDNGN']
-        egp_group = ['USDEGP', 'USDPHP', 'USDPKR', 'USDTRY', 'USDZAR']
-        
-        # Parse all signals from all assets
+        # Combine ALL 12 assets
         all_signals = []
         for cfg in ASSET_CONFIG.values():
             all_signals.extend(parse_signals(cfg['list']))
         
-        # Group by time
-        time_groups = {}
+        # Remove duplicate times
+        seen_times = set()
+        unique_signals = []
         for sig in all_signals:
-            t = sig['time']
-            if t not in time_groups:
-                time_groups[t] = {'BRL': [], 'COP': [], 'EGP': []}
-            asset_name = sig['asset'].replace('-OTC', '')
-            # Find which group this asset belongs to
-            for g, assets in [('BRL', brl_group), ('COP', cop_group), ('EGP', egp_group)]:
-                if asset_name in assets:
-                    time_groups[t][g].append(sig)
-                    break
+            if sig['time'] not in seen_times:
+                seen_times.add(sig['time'])
+                unique_signals.append(sig)
         
-        # Build rotated signal list: at each time, pick one from each group in rotation
-        sorted_times = sorted(time_groups.keys())
-        rotated_signals = []
-        group_order = ['EGP', 'COP', 'BRL']  # Rotation order
-        group_index = 0
-        
-        for t in sorted_times:
-            groups = time_groups[t]
-            # Try current group first, then next, then next
-            for attempt in range(3):
-                g = group_order[(group_index + attempt) % 3]
-                if groups[g]:
-                    rotated_signals.append(groups[g][0])
-                    group_index = (group_index + attempt + 1) % 3
-                    break
+        # Sort by time
+        unique_signals.sort(key=lambda x: x['time'])
         
         ok = 0; fl = 0; last_time = None
-        for sig in rotated_signals:
+        for sig in unique_signals:
             ct = convert_time(sig['time']); cf = get_conf(); mg = get_mg_step(uid, sig['asset'])
             sd = {'asset': sig['asset'], 'time': sig['time'], 'original_time': sig['time'], 'converted_time': ct, 'direction': sig['direction'], 'confidence': cf, 'martingale_step': mg}
             o, sid, last_time = await sched_with_gap(bot, uid, sd, last_time)
             if o: ok += 1
             else: fl += 1
         
-        await bot.send_message(chat_id=uid, text=f"✅ {ok} MIXED signals!\n⚠️ {fl} skipped\n📢 {ch}\n⏰ UTC+5:30\n🔄 12 Assets Rotating (EGP→COP→BRL)", reply_markup=main_menu())
+        await bot.send_message(chat_id=uid, text=f"✅ {ok} MIXED signals!\n⚠️ {fl} skipped (past)\n📢 {ch}\n⏰ UTC+5:30\n🔄 12 Assets combined", reply_markup=main_menu())
         return
     
     # Single asset
@@ -686,7 +671,7 @@ async def sched_normal(bot, uid, sd):
         now = datetime.utcnow() + timedelta(hours=5, minutes=30)
         tgt = now.replace(hour=h, minute=m, second=0, microsecond=0)
         pt = tgt - timedelta(minutes=1)
-        if pt <= now: return False, None
+        if pt <= now: return False, None  # SKIP past
         delay = (pt - now).total_seconds()
         if delay < 0: return False, None
         sid = f"{sd['asset']}_{sd['converted_time']}_{random.randint(10000,99999)}"
@@ -706,7 +691,7 @@ async def sched_with_gap(bot, uid, sd, last_time):
         if last_time is not None:
             min_allowed = last_time + timedelta(minutes=MTG_GAP_MINUTES)
             if pt < min_allowed: pt = min_allowed
-        if pt <= now: return False, None, last_time
+        if pt <= now: return False, None, last_time  # SKIP past
         delay = (pt - now).total_seconds()
         if delay < 0: return False, None, last_time
         sid = f"{sd['asset']}_{sd['converted_time']}_{random.randint(10000,99999)}"
@@ -740,8 +725,8 @@ def main():
     tracker.load()
     print(f"""
 ╔══════════════════════════════════╗
-║  🤖 SIGNAL BOT v25 FINAL    ║
-║  12 Assets • ALL Balanced  ║
+║  🤖 SIGNAL BOT v24 FINAL    ║
+║  12 Assets • MIXED • ALL   ║
 ╚══════════════════════════════════╝
 ✅ Ready!
 """)

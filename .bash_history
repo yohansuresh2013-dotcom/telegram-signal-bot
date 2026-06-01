@@ -108,3 +108,9 @@ python v1.py
 nano v1.py
 python v1.py
 python v2.py
+python v5.py
+ls
+python v5.py
+nano v28.py
+python v8.py
+python v28.py
